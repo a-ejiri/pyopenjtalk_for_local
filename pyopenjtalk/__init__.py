@@ -225,33 +225,23 @@ def make_label(njd_features):
     return _global_jtalk.make_label(njd_features)
 
 
-def mecab_dict_index(path, out_path, dn_mecab=None):
+def create_user_dict(path, out_path):
     """Create user dictionary
 
     Args:
         path (str): path to user csv
         out_path (str): path to output dictionary
-        dn_mecab (optional. str): path to mecab dictionary
     """
     global _global_jtalk
     if _global_jtalk is None:
         _lazy_init()
     if not exists(path):
-        raise FileNotFoundError("no such file or directory: %s" % path)
-    if dn_mecab is None:
-        dn_mecab = OPEN_JTALK_DICT_DIR
-    r = _mecab_dict_index(dn_mecab, path.encode("utf-8"), out_path.encode("utf-8"))
-
-    # NOTE: mecab load returns 1 if success, but mecab_dict_index return the opposite
-    # yeah it's confusing...
-    if r != 0:
-        raise RuntimeError("Failed to create user dictionary")
+        raise ValueError("no such file or directory: %s" % path)
+    _mecab_dict_index(OPEN_JTALK_DICT_DIR, path.encode("utf-8"), out_path.encode("utf-8"))
 
 
-def update_global_jtalk_with_user_dict(path):
-    """Update global openjtalk instance with the user dictionary
-
-    Note that this will change the global state of the openjtalk module.
+def set_user_dict(path):
+    """Apply user dictionary
 
     Args:
         path (str): path to user dictionary
@@ -260,7 +250,15 @@ def update_global_jtalk_with_user_dict(path):
     if _global_jtalk is None:
         _lazy_init()
     if not exists(path):
-        raise FileNotFoundError("no such file or directory: %s" % path)
+        raise ValueError("no such file or directory: %s" % path)
     _global_jtalk = OpenJTalk(
         dn_mecab=OPEN_JTALK_DICT_DIR, userdic=path.encode("utf-8")
     )
+
+
+def unset_user_dict():
+    """Stop applying user dictionary"""
+    global _global_jtalk
+    if _global_jtalk is None:
+        _lazy_init()
+    _global_jtalk = OpenJTalk(dn_mecab=OPEN_JTALK_DICT_DIR)
