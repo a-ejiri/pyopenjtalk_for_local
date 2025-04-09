@@ -4,7 +4,7 @@ requires = [
     "setuptools>=60.0.0; sys.platform=='win32'",
     "setuptools<v60.0; python_version<'3.12' and sys.platform!='win32'",
     "cython>=0.28.0",
-    "cmake",
+    "cmake<4.0.0",
     "numpy>=1.25.0; python_version>='3.9'",
     "oldest-supported-numpy; python_version<'3.9'",
 ]
